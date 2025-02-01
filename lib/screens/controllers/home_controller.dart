@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:next/utils/app_constants.dart';
 
 import '../../data/models/products_model.dart';
 import '../../data/models/restaurantModel.dart';
@@ -14,6 +15,7 @@ class HomeController extends GetxController {
   final isLoading = true.obs;
   final scrollController = ScrollController();
   final categories = <Category>[].obs;
+  final isRefreshing = false.obs;
 
   HomeController({required this.repository});
 
@@ -29,6 +31,42 @@ class HomeController extends GetxController {
   void onClose() {
     scrollController.dispose();
     super.onClose();
+  }
+
+  Future<void> refreshData() async {
+    try {
+      isRefreshing(true);
+
+      // Refresh restaurant info
+      await fetchRestaurantInfo();
+
+      // Reset categories and fetch new data
+      categories.clear();
+      setupDummyData();
+
+      // Reset selected category
+      selectedCategoryIndex.value = 0;
+
+      // Show success message
+      Get.snackbar(
+        'Success',
+        'Data refreshed successfully',
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to refresh data',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isRefreshing(false);
+    }
   }
 
   void setupScrollListener() {
@@ -171,7 +209,7 @@ class HomeController extends GetxController {
             price: 120,
             originalPrice: 150,
             isPopular: true,
-            imageUrl: 'https://i.imgur.com/JPWchHE.png',
+            imageUrl: AppConstants.burger1,
             categoryId: '1',
             isShowVariant: true,
           ),
@@ -182,7 +220,7 @@ class HomeController extends GetxController {
             price: 130,
             originalPrice: 160,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/Yo12VcC.png',
+            imageUrl: AppConstants.burger2,
             categoryId: '1',
           ),
         ],
@@ -199,7 +237,7 @@ class HomeController extends GetxController {
               price: 120,
               originalPrice: 150,
               isPopular: true,
-              imageUrl: 'https://i.imgur.com/wvdAw33.png',
+              imageUrl: AppConstants.pizza1,
               categoryId: '1',
               isShowVariant: true),
           Product(
@@ -209,7 +247,7 @@ class HomeController extends GetxController {
             price: 130,
             originalPrice: 160,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/Mv6K61t.png',
+            imageUrl: AppConstants.pizza2,
             categoryId: '1',
           ),
         ],
@@ -226,7 +264,7 @@ class HomeController extends GetxController {
             price: 90,
             originalPrice: 110,
             isPopular: true,
-            imageUrl: 'https://i.imgur.com/JLAFupN.png',
+            imageUrl: AppConstants.chicken1,
             categoryId: '2',
           ),
           Product(
@@ -236,8 +274,9 @@ class HomeController extends GetxController {
             price: 85,
             originalPrice: 100,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/dYwbl1T.png',
+            imageUrl: AppConstants.chicken2,
             categoryId: '2',
+            isShowVariant: true,
           ),
         ],
       ),
@@ -253,7 +292,7 @@ class HomeController extends GetxController {
             price: 120,
             originalPrice: 150,
             isPopular: true,
-            imageUrl: 'https://i.imgur.com/qAuEAS7.png',
+            imageUrl: AppConstants.food1,
             categoryId: '1',
           ),
           Product(
@@ -263,8 +302,9 @@ class HomeController extends GetxController {
             price: 130,
             originalPrice: 160,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/tbo1zHV.png',
+            imageUrl: AppConstants.food2,
             categoryId: '1',
+            isShowVariant: true,
           ),
         ],
       ),
@@ -280,8 +320,9 @@ class HomeController extends GetxController {
             price: 120,
             originalPrice: 150,
             isPopular: true,
-            imageUrl: 'https://i.imgur.com/hN875cx.png',
+            imageUrl: AppConstants.pizza1,
             categoryId: '1',
+            isShowVariant: true,
           ),
           Product(
             name: 'Pepperoni Pizza',
@@ -290,7 +331,7 @@ class HomeController extends GetxController {
             price: 130,
             originalPrice: 160,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/JJToyLt.png',
+            imageUrl: AppConstants.burger1,
             categoryId: '1',
           ),
         ],
@@ -307,7 +348,7 @@ class HomeController extends GetxController {
             price: 120,
             originalPrice: 150,
             isPopular: true,
-            imageUrl: 'https://i.imgur.com/hN875cx.png',
+            imageUrl: AppConstants.chicken2,
             categoryId: '1',
           ),
           Product(
@@ -317,8 +358,9 @@ class HomeController extends GetxController {
             price: 130,
             originalPrice: 160,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/JJToyLt.png',
+            imageUrl: AppConstants.pizza1,
             categoryId: '1',
+            isShowVariant: true,
           ),
         ],
       ),
@@ -334,8 +376,9 @@ class HomeController extends GetxController {
             price: 120,
             originalPrice: 150,
             isPopular: true,
-            imageUrl: 'https://i.imgur.com/hN875cx.png',
+            imageUrl: AppConstants.pizza2,
             categoryId: '1',
+            isShowVariant: true,
           ),
           Product(
             name: 'Pepperoni Pizza',
@@ -344,7 +387,7 @@ class HomeController extends GetxController {
             price: 130,
             originalPrice: 160,
             isPopular: false,
-            imageUrl: 'https://i.imgur.com/JJToyLt.png',
+            imageUrl: AppConstants.burger2,
             categoryId: '1',
           ),
         ],

@@ -22,98 +22,104 @@ class HomeScreen extends GetView<HomeController> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return CustomScrollView(
-            controller: controller.scrollController,
-            slivers: [
-              // Banner Image
-              SliverToBoxAdapter(
-                child: Obx(
-                  () => controller.restaurantInfo.value?.profileImageUrl != null
-                      ? Image.network(
-                          controller.restaurantInfo.value!.profileImageUrl,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        )
-                      : Container(
-                          height: 200,
-                          color: Colors.grey[300],
-                          child: const Center(child: Icon(Icons.image)),
-                        ),
-                ),
-              ),
-
-              // Restaurant Info Section
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    const RestaurantInfoWidget(),
-                    PromotionalBannerWidget(
-                      currency:
-                          controller.restaurantInfo.value?.currency ?? 'AED',
-                    ),
-                  ],
-                ),
-              ),
-
-              // Categories Section
-              const SliverPersistentHeader(
-                delegate: _SliverAppBarDelegate(
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                    child: CategoryListWidget(),
+          return RefreshIndicator(
+            onRefresh: controller.refreshData,
+            child: CustomScrollView(
+              controller: controller.scrollController,
+              slivers: [
+                // Banner Image
+                SliverToBoxAdapter(
+                  child: Obx(
+                    () => controller.restaurantInfo.value?.profileImageUrl !=
+                            null
+                        ? Image.network(
+                            controller.restaurantInfo.value!.profileImageUrl,
+                            height: 200,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          )
+                        : Container(
+                            height: 200,
+                            color: Colors.grey[300],
+                            child: const Center(child: Icon(Icons.image)),
+                          ),
                   ),
                 ),
-                pinned: true,
-              ),
 
-              SliverToBoxAdapter(
-                child: SizedBox(height: 8), // Adds 8dp gap
-              ),
+                // Restaurant Info Section
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      const RestaurantInfoWidget(),
+                      PromotionalBannerWidget(
+                        currency:
+                            controller.restaurantInfo.value?.currency ?? 'AED',
+                      ),
+                    ],
+                  ),
+                ),
 
-              // Products Section
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                sliver: Obx(() => SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, categoryIndex) {
-                          final category = controller.categories[categoryIndex];
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                child: Text(
-                                  '${category.emoji} ${category.name}',
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                // Categories Section
+                const SliverPersistentHeader(
+                  delegate: _SliverAppBarDelegate(
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                      child: CategoryListWidget(),
+                    ),
+                  ),
+                  pinned: true,
+                ),
+
+                SliverToBoxAdapter(
+                  child: SizedBox(height: 8), // Adds 8dp gap
+                ),
+
+                // Products Section
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: Obx(() => SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, categoryIndex) {
+                            final category =
+                                controller.categories[categoryIndex];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  child: Text(
+                                    '${category.emoji} ${category.name}',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              ...category.products.map((product) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: ProductCardWidget(
-                                      name: product.name,
-                                      description: product.description,
-                                      weight: product.weight,
-                                      price: product.price,
-                                      originalPrice: product.originalPrice,
-                                      isPopular: product.isPopular,
-                                      imageUrl: product.imageUrl,
-                                      onTap: () => onProductTap(product),
-                                    ),
-                                  )),
-                            ],
-                          );
-                        },
-                        childCount: controller.categories.length,
-                      ),
-                    )),
-              ),
-            ],
+                                ...category.products.map((product) => Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 16),
+                                      child: ProductCardWidget(
+                                        name: product.name,
+                                        description: product.description,
+                                        weight: product.weight,
+                                        price: product.price,
+                                        originalPrice: product.originalPrice,
+                                        isPopular: product.isPopular,
+                                        imageUrl: product.imageUrl,
+                                        onTap: () => onProductTap(product),
+                                      ),
+                                    )),
+                              ],
+                            );
+                          },
+                          childCount: controller.categories.length,
+                        ),
+                      )),
+                ),
+              ],
+            ),
           );
         }),
       ),
